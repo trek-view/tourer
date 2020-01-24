@@ -13,7 +13,7 @@ class Explorer(object):
     def __init__(self, init=False):
         self.name = 'Trek View Explorer'
         self.short_name = 'explorer'
-        self.api_url = 'https://staging.explorer.trekview.org/api/v1/'
+        self.api_url = 'https://explorer.trekview.org/api/v1/'
         self.key_reason = None
         self.headers = None
 
