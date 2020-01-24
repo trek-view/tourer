@@ -1,6 +1,6 @@
 # Tourer
 
-Version: 0.1
+Version: 1.0
 
 ## About
 
@@ -29,7 +29,7 @@ This work is licensed under a [GNU AFFERO GENERAL PUBLIC LICENSE (Version 3)](LI
 
 ## Where to get help
 
-Tourer is maintained by the team at [Trek View], a not-for-profit organisation using the power of panoramic photography to help protect against further destruction of our beautiful planet.
+Tourer is maintained by the team at [Trek View](https://www.trekview.org/), a not-for-profit organisation using the power of panoramic photography to help protect against further destruction of our beautiful planet.
 
 We will do our best to help you in a timely manner, but we are a small team and this might take time.
 
