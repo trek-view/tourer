@@ -591,7 +591,7 @@ def upload_photos(tour, validated_files, integrations, mode='basic'):
                 locality = None
 
                 if auth_config[3]['key']:
-                    place_url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng={},{}&key={}&location_type=APPROXIMATE&result_type=locality'.format(
+                    place_url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng={},{}&key={}&result_type=locality'.format(
                                         latitude, longitude, auth_config[3]['key'])
                                         
                     r = requests.get(place_url)
