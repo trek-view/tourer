@@ -98,7 +98,7 @@ class Photo(Base):
     country = Column(String(50))
     country_code = Column(String(50))
     location_code = Column(String(20))
-    place_id = Column(String(50))
+    place_id = Column(String(100))
     postal_code = Column(String(250))
     street_view_url = Column(Text())
     street_view_view_count = Column(Text())

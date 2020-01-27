@@ -990,6 +990,7 @@ def set_photo_data(photo):
         'address[country]': photo.country,
         'address[country_code]': photo.country_code,
         'address[place_id]': photo.place_id,
+        'address[postal_code]': photo.postal_code,
         'address[plus_code]': photo.location_code,
         'streetview[photo_id]': photo.street_view_photoid,
         'streetview[capture_time]': photo.street_view_capture_time,
