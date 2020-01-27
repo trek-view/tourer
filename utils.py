@@ -1092,7 +1092,7 @@ def sync_push(intg_status):
                     fl = {
                         'timestamp': photo.taken,
                         'fname': photo.fullpath,
-                        'photo_id': photo.id,
+                        'place_id': photo.place_id,
                         'gpsdata': {
                             'Latitude': photo.lat,
                             'Longitude': photo.lon,
