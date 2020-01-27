@@ -596,7 +596,7 @@ def upload_photos(tour, validated_files, integrations, mode='basic'):
                                         
                     r = requests.get(place_url)
                     if r.json()['results']:
-                        place = r.json()['results'][-1]
+                        place = r.json()['results'][-2]
                         place_id = place.get('place_id')
                         postal_code = None
                         for x in place['address_components']:
