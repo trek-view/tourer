@@ -6,7 +6,6 @@ import click
 import datetime
 
 import requests
-import pycountry
 import google.oauth2.credentials
 import googleapiclient.discovery
 
@@ -111,7 +110,12 @@ class GoogleStreetView(object):
         if last_part_uploaded:
             seconds = int((fl['timestamp'] - datetime.datetime.utcfromtimestamp(0)).total_seconds())
             timestamp = Timestamp(seconds=seconds)
-            photo = resources_pb2.Photo(capture_time=timestamp)
+            if fl['place_id']:
+                place = resources_pb2.Place(place_id=fl['place_id'])
+                photo = resources_pb2.Photo(capture_time=timestamp, places=[place])
+            else:
+                photo = resources_pb2.Photo(capture_time=timestamp)
+            
             photo.upload_reference.upload_url = upload_ref.upload_url
             uploaded_photo = self.stclient.create_photo(photo)
 
@@ -150,7 +154,7 @@ class GoogleStreetView(object):
                         'https://www.googleapis.com/auth/userinfo.profile'
                         ],
             )
-            path = auth_config[0]['credentials_file']
+            path = 'creds/gsv_creds.data'
             
             if not os.path.isfile(path):
                 open(path, 'tw', encoding='utf-8').close()
@@ -161,6 +165,8 @@ class GoogleStreetView(object):
             if credentials is None or credentials.invalid:
                 credentials = tools.run_flow(flow, storage, tools.argparser.parse_args(args=['--noauth_local_webserver']))
 
+            self.refresh_token(credentials, storage)
+            
             tokeninfo = self.get_token_info(credentials.access_token)
             if tokeninfo == -2:
                 print('Network unavailable')
@@ -186,8 +192,8 @@ class GoogleStreetView(object):
                 res = requests.get(url)
                 tokeninfo = json.loads(res.text)
                 seconds_to_expire = int(tokeninfo.get('expires_in', 0))
-
-                if seconds_to_expire == 0:
+        
+                if seconds_to_expire <= 0:
                     return -1
                 else:
                     expires = datetime.datetime.now() + datetime.timedelta(seconds=seconds_to_expire)

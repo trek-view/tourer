@@ -22,7 +22,7 @@ class OpenTrailView(object):
     def get_access_token(self):
         token = None
 
-        credentials_file = auth_config[1]['credentials_file']
+        credentials_file = 'creds/otv_creds.data'
         if os.path.exists(credentials_file):
             with open(credentials_file, 'r') as cf:
                 credentials = json.load(cf)

@@ -9,12 +9,13 @@ from math import radians, cos, sin, asin, sqrt
 
 import click
 import inquirer
+import requests
 import pycountry
 import reverse_geocode
 
 from PIL import Image, ExifTags
 from GPSPhoto import gpsphoto
-from geopy.geocoders import Nominatim
+from sqlalchemy import asc
 
 from constants import *
 from models import Base, TourType, TransportType, Tour, Photo, TourTransport
@@ -497,14 +498,13 @@ def edit_tour(tour):
 
 
 def set_tour_connections(tour):
-    sorted_photos = []
-
+    sorted_photos = session.query(Photo).filter(Photo.tour_id == tour.tour_id).order_by(asc(Photo.taken)).all()
     previous_photo = None
-    for x in tour.photos:
+    for x in sorted_photos:
         connections = []
         next_photo = None
         
-        for y in tour.photos:
+        for y in sorted_photos:
             if x != y:
                 if x.taken < y.taken and next_photo:
                     if y.taken < next_photo.taken:
@@ -514,11 +514,11 @@ def set_tour_connections(tour):
                     next_photo = y
                         
                 connection = find_connection(x, y)
-                if not connection:
-                    continue
-                else:
+                if connection:
                     connections.append(connection)
-
+                else:
+                    continue
+                    
         if next_photo:
             lat1 = float(x.lat)
             lon1 = float(x.lon)
@@ -583,6 +583,33 @@ def upload_photos(tour, validated_files, integrations, mode='basic'):
                 lc = olc.encode(latitude, longitude)
                 path, filename = os.path.split(fl['fname'])
                 photo_id = str(uuid.uuid4())[:8]
+                place_id = None
+                postal_code = None
+                administrative_area_level_1 = None
+                administrative_area_level_2 = None
+                administrative_area_level_3 = None
+                locality = None
+
+                if auth_config[3]['key']:
+                    place_url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng={},{}&key={}'.format(
+                                        latitude, longitude, auth_config[3]['key'])
+                                        
+                    r = requests.get(place_url)
+                    if r.json()['results']:
+                        place = r.json()['results'][0]
+                        place_id = place.get('place_id')
+                        postal_code = None
+                        for x in place['address_components']:
+                            if 'postal_code' in x['types']:
+                                postal_code = x['long_name']
+                            elif 'administrative_area_level_1' in x['types']:
+                                administrative_area_level_1 = x['long_name']
+                            elif 'administrative_area_level_2' in x['types']:
+                                administrative_area_level_2 = x['long_name']
+                            elif 'administrative_area_level_3' in x['types']:
+                                administrative_area_level_3 = x['long_name']
+                            elif 'locality' in x['types']:
+                                locality = x['long_name']
 
                 photo = Photo(
                     tour=tour,
@@ -599,6 +626,12 @@ def upload_photos(tour, validated_files, integrations, mode='basic'):
                     camera_model=camera_model,
                     photo_id=photo_id,
                     taken=capture_time,
+                    locality=locality,
+                    administrative_area_level_1=administrative_area_level_1,
+                    administrative_area_level_2=administrative_area_level_2,
+                    administrative_area_level_3=administrative_area_level_3,
+                    place_id=place_id,
+                    postal_code=postal_code,
                     uploaded=True
                 )
 
@@ -635,6 +668,7 @@ def upload_photos(tour, validated_files, integrations, mode='basic'):
             fl = {
                 'timestamp': photo.taken,
                 'fname': photo.fullpath,
+                'place_id': photo.place_id,
                 'gpsdata': {
                     'Latitude': photo.lat,
                     'Longitude': photo.lon,
@@ -696,15 +730,6 @@ def upload_photos(tour, validated_files, integrations, mode='basic'):
 
         if mode == 'update':
             explorer.update_tour(tour.explorer_tour_id, photos=photos)
-            # update_photo_list = []
-            # for p in tour.photos:
-            #     photo_data = set_photo_data(p)
-            #     update_photo_list.append(photo_data)
-
-            # update_connections(update_photo_list)
-            # for x in update_photo_list:
-            #     explorer.update_photo(x, tour.explorer_tour_id, x['explorer_photo_id'])
-
         else:
             explorer_tour_id = explorer.create_tour(tour.name, tour.description, tags, tour_type,
                                                     transport_type, tour.tour_id)
@@ -860,21 +885,10 @@ def delete_photo(tour):
         if not success:
             delete = False
 
-    if delete:
-        set_tour_connections(tour)
-
-        # if 'explorer' in integrations:
-        #     update_photo_list = []
-        #     for p in tour.photos:
-        #         photo_data = set_photo_data(p)
-        #         update_photo_list.append(photo_data)
-
-        #     update_connections(update_photo_list)
-        #     for x in update_photo_list:
-        #         explorer.update_photo(x, tour.explorer_tour_id, x['explorer_photo_id'])
-                
+    if delete:          
         session.delete(photo)
         session.commit()
+        set_tour_connections(tour)
         print('Photo {} deleted'.format(photo.photo_id))
     else:
         print('Photo {} cannot be deleted'.format(photo.photo_id))
@@ -969,17 +983,14 @@ def set_photo_data(photo):
         'elevation_meters': photo.elevation,
         'camera_make': photo.camera_make,
         'camera_model': photo.camera_model,
-        'google[plus_code_global_code]': photo.location_code,
-        'google[plus_code_compound_code]': None,
-        'address[cafe]': None,
-        'address[road]': None,
-        'address[suburb]': None,
-        'address[county]': None,
-        'address[region]': None,
-        'address[state]': None,
-        'address[postcode]': None,
+        'address[locality]': photo.locality,
+        'address[administrative_area_level_1]': photo.administrative_area_level_1,
+        'address[administrative_area_level_2]': photo.administrative_area_level_2,
+        'address[administrative_area_level_3]': photo.administrative_area_level_3,
         'address[country]': photo.country,
         'address[country_code]': photo.country_code,
+        'address[place_id]': photo.place_id,
+        'address[plus_code]': photo.location_code,
         'streetview[photo_id]': photo.street_view_photoid,
         'streetview[capture_time]': photo.street_view_capture_time,
         'streetview[share_link]': photo.street_view_sharelink,
@@ -1019,9 +1030,15 @@ def set_local_photo(local_photo, ed):
     local_photo.latitude = ed['latitude']
     local_photo.longitude = ed['longitude']
     local_photo.elevation = ed['elevation_meters']
-    local_photo.location_code = ed['google']['plus_code_global_code']
+    local_photo.locality = ed['address']['locality']
+    local_photo.administrative_area_level_3 = ed['address']['administrative_area_level_3']
+    local_photo.administrative_area_level_2 = ed['address']['administrative_area_level_2']
+    local_photo.administrative_area_level_1 = ed['address']['administrative_area_level_1']
+    local_photo.postal_code = ed['address']['postal_code']
     local_photo.country = ed['address']['country']
     local_photo.country_code = ed['address']['country_code']
+    local_photo.location_code = ed['address']['plus_code']
+    local_photo.place_id = ed['address']['place_id']
     local_photo.street_view_photoid = ed['streetview']['photo_id']
     local_photo.street_view_capture_time = ed['streetview']['capture_time']
     local_photo.street_view_sharelink = ed['streetview']['share_link']

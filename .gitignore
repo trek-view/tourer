@@ -4,8 +4,9 @@ __pycache__/
 *$py.class
 .vscode/
 db.sqlite
+include/
+bin/
 
-venv/
 # C extensions
 *.so
 
@@ -65,12 +66,14 @@ instance/
 
 # Scrapy stuff:
 .scrapy
+example.ini
 
 # Sphinx documentation
 docs/_build/
 
 # PyBuilder
 target/
+photos/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -92,6 +95,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.cfg
 
 # Spyder project settings
 .spyderproject
@@ -108,9 +112,3 @@ venv.bak/
 
 # mac OS
 .DS_Store
-
-# Main
-creds/
-/photos/multi-photo/*
-main_config.ini
-photos/*

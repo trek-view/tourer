@@ -19,7 +19,6 @@ try:
         'auth_uri': 'https://opentrailview.org/oauth2/v4/authorize',
         'client_id': gc['client_id'],
         'client_secret': gc['client_secret'],
-        'credentials_file': gc['credentials_file'],
         'scope': ''   
     })
 except:
@@ -28,7 +27,6 @@ except:
         'auth_uri': 'https://opentrailview.org/oauth2/v4/authorize',
         'client_id': '',
         'client_secret': '',
-        'credentials_file': '',
         'scope': ''   
     })
 
@@ -39,7 +37,6 @@ try:
         'auth_uri': 'https://opentrailview.org/oauth/auth/authorize',
         'client_id': oc['client_id'],
         'client_secret': oc['client_secret'],
-        'credentials_file': oc['credentials_file'],
         'scope': ''
     })
 except:
@@ -48,7 +45,6 @@ except:
         'auth_uri': 'https://opentrailview.org/oauth/auth/authorize',
         'client_id': '',
         'client_secret': '',
-        'credentials_file': '',
         'scope': ''
     })
 
@@ -61,6 +57,18 @@ try:
 except:
     auth_config.append({   
         'name': 'explorer',
+        'key': ''
+    })
+
+try:
+    ge = config['geocode']
+    auth_config.append({   
+        'name': 'geocode',
+        'key': ge['geocode_key']
+    })
+except:
+    auth_config.append({   
+        'name': 'geocode',
         'key': ''
     })
 
