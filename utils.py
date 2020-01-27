@@ -596,7 +596,7 @@ def upload_photos(tour, validated_files, integrations, mode='basic'):
                                         
                     r = requests.get(place_url)
                     if r.json()['results']:
-                        place = r.json()['results'][0]
+                        place = r.json()['results'][-1]
                         place_id = place.get('place_id')
                         postal_code = None
                         for x in place['address_components']:
@@ -1092,7 +1092,6 @@ def sync_push(intg_status):
                     fl = {
                         'timestamp': photo.taken,
                         'fname': photo.fullpath,
-                        'place_id': photo.place_id,
                         'gpsdata': {
                             'Latitude': photo.lat,
                             'Longitude': photo.lon,

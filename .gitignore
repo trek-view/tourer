@@ -112,3 +112,4 @@ venv.bak/
 
 # mac OS
 .DS_Store
+example.ini
