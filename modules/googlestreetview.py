@@ -164,8 +164,8 @@ class GoogleStreetView(object):
 
             if credentials is None or credentials.invalid:
                 credentials = tools.run_flow(flow, storage, tools.argparser.parse_args(args=['--noauth_local_webserver']))
-
-            credentials = self.refresh_token(credentials, storage)
+            else:
+                credentials = self.refresh_token(credentials, storage)
             
             tokeninfo = self.get_token_info(credentials.access_token)
             if tokeninfo == -2:
