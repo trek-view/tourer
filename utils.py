@@ -652,7 +652,6 @@ def upload_photos(tour, validated_files, integrations, mode='basic'):
             print('Google Street View: We can not upload files without your agreement')
             return None
 
-        gsv = GoogleStreetView()
         integrations_list.append('gsv')
         if mode != 'integration':
             tour.integrations = ','.join(integrations_list)
@@ -675,6 +674,7 @@ def upload_photos(tour, validated_files, integrations, mode='basic'):
                     'Altitude': photo.elevation
                 }
             }
+            gsv = GoogleStreetView()
             uploaded_photo = gsv.upload_photo(fl)
             photo.street_view_photoid = uploaded_photo.photo_id.id
             if photo.street_view_photoid:
