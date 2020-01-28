@@ -591,7 +591,7 @@ def upload_photos(tour, validated_files, integrations, mode='basic'):
                 locality = None
 
                 if auth_config[3]['key']:
-                    place_url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng={},{}&key={}&result_type=locality'.format(
+                    place_url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng={},{}&key={}'.format(
                                         latitude, longitude, auth_config[3]['key'])
                                         
                     r = requests.get(place_url)
@@ -1092,6 +1092,7 @@ def sync_push(intg_status):
                     fl = {
                         'timestamp': photo.taken,
                         'fname': photo.fullpath,
+                        'place_id': photo.place_id,
                         'gpsdata': {
                             'Latitude': photo.lat,
                             'Longitude': photo.lon,
