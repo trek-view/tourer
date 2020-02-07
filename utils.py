@@ -195,7 +195,11 @@ def validate_file(path):
 
         imgwidth = exif_data.get('ImageWidth', 1)
         imgheight = exif_data.get('ImageLength', 1)
-        gpsinfo = gpsphoto.getGPSData(path)
+        try:
+            gpsinfo = gpsphoto.getGPSData(path)
+        except:
+            click.confirm('{} will be ignored. Do you want to continue?'.format(path), abort=True)
+            return None
         
         if len(gpsinfo) > 0:
             time = gpsinfo.get('UTC-Time')
