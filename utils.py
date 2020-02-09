@@ -650,8 +650,6 @@ def upload_photos(tour, validated_files, integrations, mode='basic'):
 
     if mode != 'integration':
         set_tour_connections(tour)
-    elif mode == 'integration' and 'explorer' in integrations:
-        set_tour_connections(tour)
 
     if 'gsv' in integrations:
         terms = click.confirm('Google Street View: Do you agree to Google’s Terms of Service? https://policies.google.com/terms')
