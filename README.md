@@ -1,10 +1,12 @@
-# Tourer
+# Tourer (DEPRECATED)
 
 Version: 1.0
 
+It is now deprecated with a completely rewritten UI version here: https://github.com/trek-view/explorer-poc
+
 ## About
 
-Tourer is a piece of software that allows you to manage your panoramic photo tours locally and upload them to various other panorama services (including Google Street View and Trek View Explorer).
+Tourer is a piece of software (command line tools) that allows you to manage your panoramic photo tours locally and upload them to various other panorama services (including Google Street View and Trek View Explorer).
 
 ## Quick Start
 
